@@ -6,7 +6,7 @@ from util import prefix, logging
 
 ## TODO storely secure TOKEN (maybe environment variable)
 
-TOKEN = "MTM2NDM5Njg4Mzk3NTYwMjI2OQ.GrOl8l.bDMGX2UD-yOv70dGA6IEN4hJTqxtuVSmscO_0o"
+TOKEN = "REDACTED"
 DESCRIPTION = ""
 
 intents = discord.Intents.default()
