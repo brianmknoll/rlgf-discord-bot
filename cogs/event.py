@@ -1,9 +1,11 @@
 import requests
 
+# import pdb; pdb.set_trace()
+
 from discord.ext import commands
+from util.auth import SERVER_URL, getAuthHeaders
 
 
-SERVER_URL='https://rlgf-service-821668527340.us-west1.run.app'
 EVENTS_URI=f'{SERVER_URL}/events'
 
 
@@ -38,10 +40,14 @@ class EventCog(commands.Cog):
         if ctx.guild is None:
             await ctx.send('This command can only be used in a server.')
             return
-        r = requests.post(EVENTS_URI, json={
-            'guild_id': f'{ctx.guild.name}__{ctx.guild.id}',
-            'name': message
-        })
+        r = requests.post(
+            EVENTS_URI, 
+            headers=getAuthHeaders(),
+            json={
+                'guildId': f'{ctx.guild.name}__{ctx.guild.id}',
+                'name': message
+            }
+        )
         print(r.raise_for_status())
         if r.status_code // 100 != 2:
             await ctx.send(f'Error creating event: {r.text}')

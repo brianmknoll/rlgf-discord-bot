@@ -7,7 +7,12 @@ def getDefaultLogHandler() -> logging.Handler:
         "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
     )
 
-    handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
+    handler = logging.StreamHandler()
     handler.setFormatter(formatter)
 
     return handler
+
+
+logger = logging.getLogger("discord.client")
+logger.setLevel(logging.INFO)
+logger.addHandler(getDefaultLogHandler())
