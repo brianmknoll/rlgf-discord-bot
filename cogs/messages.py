@@ -22,8 +22,8 @@ class MessagesCog(commands.Cog):
     @commands.Cog.listener("on_message")
     async def handle_new_message(self, message):
         logger.debug('handling new message')
-        memories = get_memories(message)
-        contents = upsert_message_and_get_thread(message)
+        memories = await get_memories(message)
+        contents = await upsert_message_and_get_thread(message)
         if message.author != self.bot.user:
             action = route_generate(contents, memories)
             logger.info(json.dumps(action))

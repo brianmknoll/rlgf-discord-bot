@@ -42,7 +42,7 @@ class EventCog(commands.Cog):
             return
         r = requests.post(
             EVENTS_URI, 
-            headers=getAuthHeaders(),
+            headers=await getAuthHeaders(),
             json={
                 'guildId': f'{ctx.guild.name}__{ctx.guild.id}',
                 'name': message

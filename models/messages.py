@@ -32,11 +32,11 @@ class ThreadMessage:
 
 
 
-def upsert_message_and_get_thread(message):
+async def upsert_message_and_get_thread(message):
   epoch = int(message.created_at.timestamp() * 1000)
   r = requests.post(
       MESSAGES_URI, 
-      headers=getAuthHeaders(),
+      headers=await getAuthHeaders(),
       json={
           'author': message.author.name,
           'guildId': get_guild_id(message),
@@ -49,7 +49,7 @@ def upsert_message_and_get_thread(message):
   
   r = requests.get(
     MESSAGES_URI,
-    headers=getAuthHeaders(),
+    headers=await getAuthHeaders(),
     params={
       'channel_id': get_channel_id(message),
       'guild_id': get_guild_id(message),

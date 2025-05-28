@@ -6,10 +6,10 @@ from util.auth import SERVER_URL, getAuthHeaders
 MEMORY_URI=f'{SERVER_URL}/memory'
 
 
-def upload_memory(message, memory):
+async def upload_memory(message, memory):
   r = requests.post(
       MEMORY_URI,
-      headers=getAuthHeaders(),
+      headers=await getAuthHeaders(),
       json={
           'guildId': get_guild_id(message),
           'memory': memory,
@@ -20,10 +20,10 @@ def upload_memory(message, memory):
       raise Exception(f'Error creating memory: {r.text}')
 
 
-def get_memories(message):
+async def get_memories(message):
   r = requests.get(
     MEMORY_URI,
-    headers=getAuthHeaders(),
+    headers=await getAuthHeaders(),
     params={
         'guild_id': get_guild_id(message),
     }
