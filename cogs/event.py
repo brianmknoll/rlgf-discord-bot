@@ -2,7 +2,9 @@ import requests
 
 # import pdb; pdb.set_trace()
 
+from datetime import datetime, timedelta
 from discord.ext import commands
+from config import BotConfig
 from util.auth import SERVER_URL, getAuthHeaders
 
 
@@ -53,6 +55,35 @@ class EventCog(commands.Cog):
             await ctx.send(f'Error creating event: {r.text}')
         else:
             await ctx.send(f'Event "{message}" created in server {ctx.guild.name}.')
+    
+    @commands.command(name="silence")
+    async def silence(self, ctx, *, message = None):
+        if ctx.guild is None:
+            await ctx.send('This command can only be used in a server.')
+            return
+        await ctx.message.delete()
+        if not message:
+            BotConfig.silence()
+            await ctx.send('The bot has been silenced')
+        else:
+            minutes = 0
+            try:
+                minutes = int(message)
+            except:
+                await ctx.send(f'Failed to convert "{message}" into minutes')
+                return
+            delta = timedelta(minutes=minutes)
+            BotConfig.set_silence(datetime.now() + delta)
+            await ctx.send(f'The bot has been silenced for {minutes} mins')
+    
+    @commands.command(name="wake")
+    async def wake(self, ctx):
+        if ctx.guild is None:
+            await ctx.send('This command can only be used in a server.')
+            return
+        await ctx.message.delete()
+        BotConfig.remove_silence()
+        await ctx.send('The bot is awake')
 
 
 async def setup(bot):

@@ -1,7 +1,7 @@
 import discord
+
 from discord.ext import commands
 from os import listdir
-
 from util import prefix, logging
 from enum import Enum
 
@@ -26,7 +26,6 @@ async def loadCogs() -> None:
             print(f"loading {cog}")
             await bot.load_extension(cog)
             COGS[cog] = CogStatus.LOADED
-
 
 
 ## TODO storely secure TOKEN (maybe environment variable)

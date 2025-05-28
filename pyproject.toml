@@ -8,5 +8,6 @@ dependencies = [
     "discord-py>=2.5.2",
     "google-auth>=2.39.0",
     "google-genai>=1.15.0",
+    "pyjwt>=2.10.1",
     "requests>=2.32.3",
 ]
