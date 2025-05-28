@@ -45,30 +45,40 @@ def upsert_message_and_get_thread(message):
           'timestamp': epoch,
       }
   )
+  throw_if_bad_status(r, ignore_conflict=True)
+  
+  r = requests.get(
+    MESSAGES_URI,
+    headers=getAuthHeaders(),
+    params={
+      'channel_id': get_channel_id(message),
+      'guild_id': get_guild_id(message),
+    }
+  )
   throw_if_bad_status(r)
-  if r.status_code // 100 == 2:
-    msgs = r.json()
 
-    content: List[ThreadMessage] = []
-    for m in msgs:
-        author = m['author']
-        message = m['message']
-        timestamp = datetime.strptime(
-          m['timestamp'], 
-          "%Y-%m-%dT%H:%M:%S.%fZ"
-        ).replace(tzinfo=timezone.utc)
-        if m['author'] == CONTACT_BOT_AUTHOR:
-            content.append(ThreadMessage.from_bot(message, timestamp))
-        else:
-            content.append(ThreadMessage(author, message, timestamp))
-    return content
+  msgs = r.json()
+
+  content: List[ThreadMessage] = []
+  for m in msgs:
+    author = m['author']
+    message = m['message']
+    timestamp = datetime.strptime(
+      m['timestamp'], 
+      "%Y-%m-%dT%H:%M:%S.%fZ"
+    ).replace(tzinfo=timezone.utc)
+    if m['author'] == CONTACT_BOT_AUTHOR:
+        content.append(ThreadMessage.from_bot(message, timestamp))
+    else:
+        content.append(ThreadMessage(author, message, timestamp))
+  return content
 
 
-def throw_if_bad_status(r):
+def throw_if_bad_status(r, *, ignore_conflict=False):
   try:
     print(r.raise_for_status())
   except requests.exceptions.HTTPError:
-    if r.status_code == 409:
+    if r.status_code == 409 and ignore_conflict:
       logger.debug("AlreadyExists; continuing without error.")
     else:
       raise
