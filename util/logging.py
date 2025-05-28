@@ -6,13 +6,11 @@ def getDefaultLogHandler() -> logging.Handler:
     formatter = logging.Formatter(
         "[{asctime}] [{levelname:<8}] {name}: {message}", dt_fmt, style="{"
     )
-
     handler = logging.StreamHandler()
     handler.setFormatter(formatter)
-
     return handler
 
 
 logger = logging.getLogger("discord.client")
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 logger.addHandler(getDefaultLogHandler())

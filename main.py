@@ -3,33 +3,42 @@ from discord.ext import commands
 from os import listdir
 
 from util import prefix, logging
+from enum import Enum
 
-## TODO storely secure TOKEN (maybe environment variable)
+COGS_PATH = 'cogs'
 
-TOKEN = "REDACTED"
-DESCRIPTION = ""
+class CogStatus(Enum):
+    WAITING = "WAITING"
+    LOADED = "LOADED"
 
-intents = discord.Intents.default()
-intents.message_content = True
 
-bot = commands.Bot(
-    command_prefix=prefix.getPrefix, description=DESCRIPTION, intents=intents
-)
+COGS = {}
+
+for cog in listdir(COGS_PATH):
+    if cog.endswith(".py"):
+        name = cog[:-3]  # Remove the .py extension
+        COGS[f"{COGS_PATH}.{name}"] = CogStatus.WAITING
 
 
 async def loadCogs() -> None:
-    """
-    Loads the cogs from the `./cogs` folder.
+    for cog, status in COGS.items():
+        if status == CogStatus.WAITING:
+            print(f"loading {cog}")
+            await bot.load_extension(cog)
+            COGS[cog] = CogStatus.LOADED
 
-    Notes:
-        The cogs are .py files.
-        The cogs are named in this format `{cog_dir}.{cog_filename_without_extension}`.
-    """
-    for cog in listdir("./cogs"):
-        if cog.endswith(".py") == True:
-            print(f"loading cogs.{cog[:-3]}")
-            await bot.load_extension(f"cogs.{cog[:-3]}")
 
+
+## TODO storely secure TOKEN (maybe environment variable)
+TOKEN = ''
+DESCRIPTION = ''
+
+INTENTS = discord.Intents.default()
+INTENTS.message_content = True
+
+bot = commands.Bot(
+    command_prefix=prefix.getPrefix, description=DESCRIPTION, intents=INTENTS
+)
 
 @bot.event
 async def on_ready():
