@@ -1,4 +1,5 @@
 import requests
+from api.client import get, post
 from models.guild import get_guild_id
 from util.auth import SERVER_URL, getAuthHeaders
 
@@ -7,7 +8,7 @@ MEMORY_URI=f'{SERVER_URL}/memory'
 
 
 async def upload_memory(message, memory):
-  r = requests.post(
+  post(
       MEMORY_URI,
       headers=await getAuthHeaders(),
       json={
@@ -15,21 +16,13 @@ async def upload_memory(message, memory):
           'memory': memory,
       }
   )
-  print(r.raise_for_status())
-  if r.status_code // 100 != 2:
-      raise Exception(f'Error creating memory: {r.text}')
 
 
 async def get_memories(message):
-  r = requests.get(
+  payload = get(
     MEMORY_URI,
-    headers=await getAuthHeaders(),
     params={
         'guild_id': get_guild_id(message),
     }
   )
-  print(r.raise_for_status())
-  if r.status_code // 100 != 2:
-      raise Exception(f'Error getting memories: {r.text}')
-  payload = r.json()
   return payload.get('memory', [])
