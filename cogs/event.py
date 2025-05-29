@@ -1,5 +1,6 @@
 import requests
 import discord
+from api.client import post
 from util.logging import logger
 
 # import pdb; pdb.set_trace()
@@ -52,16 +53,11 @@ class EventCog(commands.Cog):
         if ctx.guild is None:
             await ctx.send("This command can only be used in a server.")
             return
-        r = requests.post(
+        await post(
             EVENTS_URI,
-            headers=await getAuthHeaders(),
-            json={"guildId": f"{ctx.guild.name}__{ctx.guild.id}", "name": message},
+            {"guildId": f"{ctx.guild.name}__{ctx.guild.id}", "name": message},
         )
-        print(r.raise_for_status())
-        if r.status_code // 100 != 2:
-            await ctx.send(f"Error creating event: {r.text}")
-        else:
-            await ctx.send(f'Event "{message}" created in server {ctx.guild.name}.')
+        await ctx.send(f'Event "{message}" created in server {ctx.guild.name}.')
 
     @commands.command(name="silence")
     async def silence(self, ctx, *, message=None):

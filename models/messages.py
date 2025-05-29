@@ -33,7 +33,7 @@ class ThreadMessage:
 
 async def upsert_message_and_get_thread(message):
   epoch = int(message.created_at.timestamp() * 1000)
-  post(
+  await post(
       MESSAGES_URI, 
       {
           'author': message.author.name,
@@ -45,7 +45,7 @@ async def upsert_message_and_get_thread(message):
       ignore_conflict=True
   )
   
-  msgs = get(MESSAGES_URI, query_params={
+  msgs = await get(MESSAGES_URI, query_params={
     'channel_id': get_channel_id(message),
     'guild_id': get_guild_id(message),
   })

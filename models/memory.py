@@ -8,7 +8,7 @@ MEMORY_URI=f'{SERVER_URL}/memory'
 
 
 async def upload_memory(message, memory):
-  post(
+  await post(
       MEMORY_URI,
       headers=await getAuthHeaders(),
       json={
@@ -19,7 +19,7 @@ async def upload_memory(message, memory):
 
 
 async def get_memories(message):
-  payload = get(
+  payload = await get(
     MEMORY_URI,
     params={
         'guild_id': get_guild_id(message),
