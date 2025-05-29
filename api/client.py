@@ -11,7 +11,7 @@ async def post(url, body, *, ignore_conflict=False):
     json=body
   )
   throw_if_bad_status(r, ignore_conflict=ignore_conflict)
-  if r.text:
+  if r.text and r.headers.get("content-type") == 'application/json':
     return r.json()
   else:
     return None
@@ -24,7 +24,7 @@ async def get(url, *, query_params=None):
     params=query_params
   )
   throw_if_bad_status(r)
-  if r.text:
+  if r.text and r.headers.get("content-type") == 'application/json':
     return r.json()
   else:
     return None

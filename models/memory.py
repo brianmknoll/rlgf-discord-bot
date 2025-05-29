@@ -21,7 +21,7 @@ async def upload_memory(message, memory):
 async def get_memories(message):
   payload = await get(
     MEMORY_URI,
-    params={
+    query_params={
         'guild_id': get_guild_id(message),
     }
   )
