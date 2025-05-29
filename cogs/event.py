@@ -1,4 +1,6 @@
 import requests
+import discord
+from util.logging import logger
 
 # import pdb; pdb.set_trace()
 
@@ -8,7 +10,7 @@ from config import BotConfig
 from util.auth import SERVER_URL, getAuthHeaders
 
 
-EVENTS_URI=f'{SERVER_URL}/events'
+EVENTS_URI = f"{SERVER_URL}/events"
 
 
 class EventCog(commands.Cog):
@@ -34,37 +36,51 @@ class EventCog(commands.Cog):
                 ctx
                 *, message (this sets the 'consume rest' behaviour for arguments)
         """
-        await ctx.message.delete()
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            logger.warning("Bot does not have permission to delete messages.")
+        except discord.NotFound:
+            logger.warning(
+                "Original message not found, might have been already deleted."
+            )
+
         await ctx.send(message)
 
     @commands.command(name="event")
     async def event(self, ctx, *, message):
         if ctx.guild is None:
-            await ctx.send('This command can only be used in a server.')
+            await ctx.send("This command can only be used in a server.")
             return
         r = requests.post(
-            EVENTS_URI, 
+            EVENTS_URI,
             headers=await getAuthHeaders(),
-            json={
-                'guildId': f'{ctx.guild.name}__{ctx.guild.id}',
-                'name': message
-            }
+            json={"guildId": f"{ctx.guild.name}__{ctx.guild.id}", "name": message},
         )
         print(r.raise_for_status())
         if r.status_code // 100 != 2:
-            await ctx.send(f'Error creating event: {r.text}')
+            await ctx.send(f"Error creating event: {r.text}")
         else:
             await ctx.send(f'Event "{message}" created in server {ctx.guild.name}.')
-    
+
     @commands.command(name="silence")
-    async def silence(self, ctx, *, message = None):
+    async def silence(self, ctx, *, message=None):
         if ctx.guild is None:
-            await ctx.send('This command can only be used in a server.')
+            await ctx.send("This command can only be used in a server.")
             return
-        await ctx.message.delete()
+
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            logger.warning("Bot does not have permission to delete messages.")
+        except discord.NotFound:
+            logger.warning(
+                "Original message not found, might have been already deleted."
+            )
+
         if not message:
             BotConfig.silence()
-            await ctx.send('The bot has been silenced')
+            await ctx.send("The bot has been silenced")
         else:
             minutes = 0
             try:
@@ -74,16 +90,25 @@ class EventCog(commands.Cog):
                 return
             delta = timedelta(minutes=minutes)
             BotConfig.set_silence(datetime.now() + delta)
-            await ctx.send(f'The bot has been silenced for {minutes} mins')
-    
+            await ctx.send(f"The bot has been silenced for {minutes} mins")
+
     @commands.command(name="wake")
     async def wake(self, ctx):
         if ctx.guild is None:
-            await ctx.send('This command can only be used in a server.')
+            await ctx.send("This command can only be used in a server.")
             return
-        await ctx.message.delete()
+
+        try:
+            await ctx.message.delete()
+        except discord.Forbidden:
+            logger.warning("Bot does not have permission to delete messages.")
+        except discord.NotFound:
+            logger.warning(
+                "Original message not found, might have been already deleted."
+            )
+
         BotConfig.remove_silence()
-        await ctx.send('The bot is awake')
+        await ctx.send("The bot is awake")
 
 
 async def setup(bot):
